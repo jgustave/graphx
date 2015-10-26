@@ -5,6 +5,7 @@ import org.apache.spark._
 
 /**
  * http://spark.apache.org/docs/latest/quick-start.html
+ *
  */
 object Hello {
 
@@ -16,7 +17,7 @@ object Hello {
 
     val text = sc.textFile("/Users/jerdavis/devhome/spark/spark-1.5.0/README.md")
 
-    println(text.count())
+    println("HelloWorld:" + text.count())
 
   }
 }
