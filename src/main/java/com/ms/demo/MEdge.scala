@@ -6,7 +6,7 @@ import org.apache.spark.graphx._
  * We ignore Edge direction.
  *
  * @param dataSource This is the ~file that the link came from
- * @param dateTime This is the dateTime that the Link was observed.
+ * @param dateTime This is the dateTime that the Link was observed..
  */
 class MEdge(srcId : VertexId,
             dstId : VertexId,
