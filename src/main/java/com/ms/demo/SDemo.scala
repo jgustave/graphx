@@ -10,13 +10,13 @@ object SDemo {
     println("Hello World Graph")
 
     val foo = Array(1L,2L,3L)
-
-    println("Hellooo " + foo.length )
-
-    //def bidir(v:Long) = Array(v, 100+v)
-
     val result = foo.flatMap(x => Array(x,1000+x) )
     result.foreach(println(_))
+
+    val foo2 = new MEdge(1,2,"Email",4)
+
+    println(foo2 )
+
   }
 
 //  def bidir(x : Long) : Array[Long] = {

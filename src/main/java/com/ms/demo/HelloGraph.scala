@@ -68,7 +68,25 @@ object HelloGraph {
   def bidir( x : Edge[String] ) : Array[Edge[String]]  = {
     Array(Edge(x.srcId ,x.dstId), Edge(x.dstId,x.srcId))
   }
+
+  /**
+   * Properties
+   *
+   *
+   * Vertex Properties:
+   * - Type (cookie)
+   * - Value
+   *
+   *
+   *
+   * Edge Properties:
+   * - Source of the Edge
+   * - DateTime of the link
+   *
+   *
+   */
 }
+
 
 
 
