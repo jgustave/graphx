@@ -46,10 +46,10 @@ object HelloGraph {
                       Edge(12L, 9L, "")
                   )
 
-
+    //val relationships: RDD[Edge[String]] =  sc.parallelize( links.flatMap( x => bidir(x) ) )
     //Make the links bidirectional (undirected)
-    val relationships: RDD[Edge[String]] =  sc.parallelize( links.flatMap(x => Array(Edge(x.srcId ,x.dstId),
-                                                                                     Edge(x.dstId,x.srcId)) ) )
+    val relationships: RDD[Edge[String]] =  sc.parallelize( links.flatMap(x => Array(Edge[String](x.srcId ,x.dstId),
+                                                                                     Edge[String](x.dstId,x.srcId)) ) )
 
 
     val graph = Graph(users,relationships)
@@ -65,7 +65,9 @@ object HelloGraph {
 
     println("Hellooo " + cc)
   }
-  
+  def bidir( x : Edge[String] ) : Array[Edge[String]]  = {
+    Array(Edge(x.srcId ,x.dstId), Edge(x.dstId,x.srcId))
+  }
 }
 
 

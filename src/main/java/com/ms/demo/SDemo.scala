@@ -13,15 +13,15 @@ object SDemo {
 
     println("Hellooo " + foo.length )
 
-    def bidir(v:Long) = Array(v, 100+v)
+    //def bidir(v:Long) = Array(v, 100+v)
 
-    val result = foo.flatMap(x => bidir(x) )
+    val result = foo.flatMap(x => Array(x,1000+x) )
     result.foreach(println(_))
   }
 
-  def bidir(vals : Array[Long]) : Array[Long] = {
-    vals
-  }
+//  def bidir(x : Long) : Array[Long] = {
+//    Array(x,100+x)
+//  }
 
 }
 
