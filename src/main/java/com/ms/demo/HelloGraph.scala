@@ -34,16 +34,7 @@ object HelloGraph {
       ))
 
 
-    //a1 -> c1
-    //a1 -> c2
-    //c2 -> e1
-    //e1 -> c3
-    //c3 -> i1
-    //i1 -> c4
-    //i1 -> c5
-
-
-
+    //Explicitly declaring the links.
     val links = Array(Edge(10L, 1L, ""), //a1 -> c1
                       Edge(10L, 2L, ""),
                       Edge(2L, 7L, ""),
@@ -64,6 +55,9 @@ object HelloGraph {
 
     val cc = graph.connectedComponents()
 
+    /**
+     * Sort by the component ID (The lowest vertexId in the component), and then the VertexID in the component.
+     */
     for ((id, scc) <- cc.vertices.collect().sortBy(r => (r._2,r._1) )  ) {
       println(id,scc)
     }
