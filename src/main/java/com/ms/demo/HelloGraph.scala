@@ -50,7 +50,9 @@ object HelloGraph {
                       Edge(7L, 3L, ""),  //e1 -> c3
                       Edge(3L, 8L, ""),
                       Edge(8L, 4L, ""),
-                      Edge(8L, 5L, "")
+                      Edge(8L, 5L, ""),
+                      Edge(11L, 9L, ""),
+                      Edge(12L, 9L, "")
                   )
 
 
@@ -62,12 +64,11 @@ object HelloGraph {
 
     val cc = graph.connectedComponents()
 
-    for ((id, scc) <- cc.vertices.collect()) {
+    for ((id, scc) <- cc.vertices.collect().sortBy(r => (r._2,r._1) )  ) {
       println(id,scc)
     }
 
     println("Hellooo " + cc)
-
   }
 
   /**
