@@ -8,7 +8,7 @@ import org.apache.spark.graphx._
  * @param dataSource This is the ~file that the link came from
  * @param dateTime This is the dateTime that the Link was observed..
  */
-class MEdge(srcId : VertexId,
+class MEdge[VD](srcId : VertexId,
             dstId : VertexId,
             val dataSource : String,
             val dateTime : Long )
