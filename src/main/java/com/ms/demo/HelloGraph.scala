@@ -51,7 +51,7 @@ object HelloGraph {
 //    val relationships: RDD[Edge[String]] =  sc.parallelize( links.flatMap(x => Array(Edge[String](x.srcId ,x.dstId),
 //                                                                                     Edge[String](x.dstId,x.srcId)) ) )
 
-
+    //users.zipWithUniqueId()
     val graph = Graph(users,relationships)
 
     val cc = graph.connectedComponents()
