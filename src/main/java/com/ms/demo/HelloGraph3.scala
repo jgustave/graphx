@@ -38,6 +38,10 @@ object HelloGraph3 {
     //Get RDD of WHATEVER.. distinct and zip with Unique
     val bar = preUsers.map(x => x._2 ).distinct().zipWithUniqueId()
     //bar.join(preUsers)
+    //map...
+
+
+
 
 
   }
