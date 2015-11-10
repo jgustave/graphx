@@ -1,4 +1,6 @@
 package com.ms.demo
+
+import com.ms.util.Util._
 import shapeless.syntax.std.tuple._
 
 /**
@@ -13,6 +15,19 @@ object SDemo {
     val foobar = (1,2,"Three")
     val zz = foobar.reverse
 
+    val tup = (1,"foo",("bar",3.4),"ender")
+    println(tup)
+
+    val flat = flatten(tup)
+    println(flatten(tup))
+
+    var t1 = ("a","b",2)
+    val t2 = t1 :+ "foo"
+    val t3 = "bar" +: t1
+
+    println(t1)
+    println(t2)
+    println(t3)
     println(zz)
   }
 
