@@ -49,7 +49,6 @@ object HelloGraph6 {
       println(id,scc)
     }
 
-
   }
 }
 
