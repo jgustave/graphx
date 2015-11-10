@@ -2,7 +2,7 @@ package com.ms.demo
 
 import com.ms.util.Util.flatten
 import org.apache.spark._
-import org.apache.spark.graphx.VertexId
+import org.apache.spark.graphx.{Graph, Edge, VertexId}
 import org.apache.spark.rdd.RDD
 import shapeless.syntax.std.tuple._
 
@@ -37,15 +37,19 @@ object HelloGraph6 {
         yield (x.verticies(i), x.verticies(j), x.edge)
     )
 
-    //val zzz = uniqueVertexes.join( triplets.map(x=>(x._1,x.drop(1) )) ).map(x=>x._2.reverse)
-    val zzz = uniqueVertexes.join( triplets.map(x=>(x._1,x.drop(1) )) ).map(x=>x._2.reverse)
-    //val zzz = uniqueVertexes.join( triplets.map(x=>(x._1,x.drop(1) )) ).map(x=>flatten(x))
-    //val zzz = uniqueVertexes.join( triplets.map(x=>(x._1,x.drop(1) )) ).map(x=>x._2).map(x=>(x._2._1,(x._2._2)) )
+    //Get Edges, by joining UniqueIds to the Vertexes in the Tripplet
+    val relationships: RDD[Edge[EdgeAttr]] = triplets.map(x=>(x._1,x.drop(1) )).join(uniqueVertexes).map(x=>x._2).map(x=>(x._1._1,(x._1._2,x._2))).join(uniqueVertexes).map(x=>x._2).map(x=> Edge(x._2,x._1._2,x._1._1) )
+
+    val graph = Graph(allVertexes,relationships)
+
+    val cc = graph.connectedComponents()
 
 
-    for (x <- zzz  ) {
-      println(x)
+    for ((id, scc) <- cc.vertices.collect().sortBy(r => (r._2,r._1) )  ) {
+      println(id,scc)
     }
+
+
   }
 }
 
