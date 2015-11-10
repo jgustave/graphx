@@ -17,22 +17,22 @@ object HelloGraph5 {
     val sc   = new SparkContext(conf)
 
     val preUsers: RDD[VertexAttr] =
-      sc.parallelize(Array(new VertexAttr("cookie", "cookie:1"),
-                           new VertexAttr("cookie", "cookie:2"),
-                           new VertexAttr("cookie", "cookie:2"),
-                           new VertexAttr("cookie", "cookie:2"),
-                           new VertexAttr("cookie", "cookie:3"),
-                           new VertexAttr("cookie", "cookie:4"),
-                           new VertexAttr("cookie", "cookie:5"),
-                           new VertexAttr("cookie", "cookie:5"),
-                           new VertexAttr("cookie", "cookie:5"),
-                           new VertexAttr("cookie", "cookie:6"),
-                           new VertexAttr("email", "e:1"),
-                           new VertexAttr("idfa", "idfa:1"),
-                           new VertexAttr("idfa", "idfa:2"),
-                           new VertexAttr("account", "a:1"),
-                           new VertexAttr("account", "a:2"),
-                           new VertexAttr("account", "a:3")
+      sc.parallelize(Array(VertexAttr("cookie", "cookie:1"),
+                           VertexAttr("cookie", "cookie:2"),
+                           VertexAttr("cookie", "cookie:2"),
+                           VertexAttr("cookie", "cookie:2"),
+                           VertexAttr("cookie", "cookie:3"),
+                           VertexAttr("cookie", "cookie:4"),
+                           VertexAttr("cookie", "cookie:5"),
+                           VertexAttr("cookie", "cookie:5"),
+                           VertexAttr("cookie", "cookie:5"),
+                           VertexAttr("cookie", "cookie:6"),
+                           VertexAttr("email", "e:1"),
+                           VertexAttr("idfa", "idfa:1"),
+                           VertexAttr("idfa", "idfa:2"),
+                           VertexAttr("account", "a:1"),
+                           VertexAttr("account", "a:2"),
+                           VertexAttr("account", "a:3")
       ))
 
     //Example zip with unique and Map back out.
