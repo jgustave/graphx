@@ -23,10 +23,10 @@ object HelloGraph6 {
                             DataRow( Array(VertexAttr("cookie", "cookie:2"),VertexAttr("orderid", "order:2"),VertexAttr("foo", "foo:2")), EdgeAttr("click",1236)) //can have > 2 vertecies in a line.
       ))
 
-    val vertexes: RDD[(VertexId,VertexAttr)] = dataRows.flatMap(x=>x.verticies).distinct().zipWithUniqueId().map(x=>(x._2,x._1))
+    val uniqueVertexes: RDD[(VertexId,VertexAttr)] = dataRows.flatMap(x=>x.verticies).distinct().zipWithUniqueId().map(x=>(x._2,x._1))
 
 
-    for (x <- vertexes  ) {
+    for (x <- uniqueVertexes  ) {
       println(x)
     }
 
