@@ -25,6 +25,10 @@ object HelloGraph7 {
   }
 }
 
-
+/**
+ * Extract
+ * ROW UID, datasource, timestamp, vertexType, vertexValue
+ *
+ */
 
 

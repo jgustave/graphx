@@ -3,6 +3,9 @@ package com.ms.demo
 import com.ms.util.Util._
 import shapeless.syntax.std.tuple._
 
+import scala.collection.mutable.ArrayBuffer
+import scala.reflect.ClassTag
+
 /**
  * http://spark.apache.org/docs/latest/quick-start.html
  *
@@ -14,14 +17,22 @@ object SDemo {
 
     val sfoo = Array("A","B","C","D")
 
-    for (i <- 0 to sfoo.length-2; j <- i+1 until sfoo.length) {
-      println(sfoo(i),sfoo(j))
-    }
+//    for (i <- 0 to sfoo.length-2; j <- i+1 until sfoo.length) {
+//      println(sfoo(i),sfoo(j))
+//    }
         //yield (i, j)
+
 
     val zz = ("foo","bar","other").drop(1)
 
-    println(zz)
+    val ddd = List("A","B","C")
+
+    //println(cross(ddd,ddd))
+
+//    val foo = diagonal(Array("A","B"))
+//    for( x <- foo )
+//      println( x )
+
 
 //
 //
@@ -48,6 +59,22 @@ object SDemo {
 //  def bidir(x : Long) : Array[Long] = {
 //    Array(x,100+x)
 //  }
+
+
+//  def diagonal[T:ClassTag](input : Array[T] ) : Array[T] = {
+//    var foo = Array[T]() // Array.empty[T] //Array[T]()
+//    var bar = ArrayBuffer[T]()
+//    for (i <- 0 to input.length - 2; j <- i + 1 until input.length) {
+//
+//      val temp = Array[T](input(i), input(j))
+//      foo = foo :+ temp
+//      bar = bar :+ temp
+//      println("")
+//  }
+//      //yield Array( input(i), input(j) )
+//    foo
+//  }
+//
 
 }
 

@@ -4,7 +4,8 @@ package com.ms.demo
  *
  */
 case class EdgeAttr(dataSource : String,
-                    dateTime : Long) extends Serializable {
+                    dateTime : Long,
+                    uuid: String = "") extends Serializable {
 
 
   override def toString = s"EInfo(dataSource=$dataSource, dateTime=$dateTime)"
