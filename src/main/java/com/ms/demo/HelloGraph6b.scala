@@ -46,13 +46,25 @@ object HelloGraph6b {
                                                              .map(x=>(x._1._1,x._2)) //Just Keep EdgeAttr and VertexId
 
 //
-    //Group by Row UUID, convert Iterator to an Array so we can take the diagonal
-    val connections : RDD[(VertexId,VertexId,EdgeAttr)] =
-          edgeAndLink.groupBy(_._1.uuid) //group by the UID
+    //Create the Edges
+    val connections : RDD[Edge[EdgeAttr]] =
+          edgeAndLink.groupBy(_._1.uuid) //group all Rows by the UID
                       .map(x=>x._2) //Drop the Extra Grouping UID Key
-                      .map(x=> (x.unzip._1.last, x.unzip._2) ) //Split in to a single Edge, and List of VertexIds
-                      .map(x=>(x._1,halfcross(x._2,x._2) ) )
-                      .flatMap(x=>{for{i <- x._2 } yield (i._1,i._2,x._1) } ) //Map to Tripplet
+                      .map(x=> (x.unzip._1.last, x.unzip._2) ) //Split in to a single Edge, and List of VertexIds (may bemore than 2)
+                      .map(x=>(x._1,halfcross(x._2,x._2) ) ) //Take the Lower Diagonal (~half cross product)of all pairs of vertexes
+                      .flatMap(x=>{for{i <- x._2 } yield (i._1,i._2,x._1) } ) //Map to Triplet
+                      .map(x=>Edge(x._1,x._2,x._3)) //Map to Edge
+
+    //Create Graph
+    val graph = Graph(allVertexes,connections)
+
+    //Get Connected Components
+    val cc = graph.connectedComponents()
+
+    //Print out VertexID and it's CC ID.
+    for ((id, scc) <- cc.vertices.collect().sortBy(r => (r._2,r._1) )  ) {
+      println(id,scc)
+    }
 
 
     for( x <- connections ) {
