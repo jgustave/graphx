@@ -31,15 +31,21 @@ object HelloGraph6b {
 
     //TODO: Exception handling...
     //Convert to Objects
-    val packagedData = rawData.map(x=>(EdgeAttr(x._2, x._3.toLong,x._1),VertexAttr(x._4,x._5)))
+    val packagedData = rawData.map(x=>(EdgeAttr(x._2, x._3.toLong,x._1), VertexAttr(x._4,x._5)))
 
     //Get Unique IDs for Vertexes
-    val uniqueVertexes = packagedData.map(x=>x._2).distinct().zipWithUniqueId().cache()
+    val uniqueVertexes = packagedData.map(x=>x._2) //Vertex
+                                     .distinct()
+                                     .zipWithUniqueId()
+                                     .cache()
 
     //Assign Unique IDS to All
-    val allVertexes: RDD[(VertexId,VertexAttr)] = packagedData.map(x=>x._2).map(x=>(x,x)).join(uniqueVertexes).map(x=>x._2.reverse)
+    val allVertexes: RDD[(VertexId,VertexAttr)] = packagedData.map(x=>x._2) //vertex
+                                                              .map(x=>(x,x)) //make a K/V
+                                                              .join(uniqueVertexes) //Join in VertexID
+                                                              .map(x=>x._2.reverse) //Flip around
 
-    //Join in the Vertex UID and drop the VertexAttr
+    //Join in the Vertex UID and drop the VertexAttr 
     val edgeAndLink: RDD[(EdgeAttr,VertexId)] = packagedData.map(x=>(x._2,x)) //Vertex and Everything
                                                              .join(uniqueVertexes) //Join in VertexId
                                                              .map(x=>x._2) //Drop the Join Key
