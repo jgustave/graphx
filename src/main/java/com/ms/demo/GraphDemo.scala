@@ -70,25 +70,29 @@ UNION ALL
 
  *
  */
-object HelloGraph6b {
+object GraphDemo {
 
   def main( args: Array[String] ) = {
-    println("Hello World Graph")
+    println("Hello Graph Demo")
 
-    //val conf = new SparkConf().setAppName("Simple Application")
-    val conf = new SparkConf().setAppName("Simple Application").setMaster("local[2]").set("spark.executor.memory","1g")
+    //conf.set("textinputformat.record.delimiter", "\u0001")
+    val conf = new SparkConf().setAppName("Graph Demo")
     val sc   = new SparkContext(conf)
 
 
     //UUID,source,time,type,val
-    val rawData = sc.parallelize(Array(
-                                    ("uuid1","click","1234","cookie","cookie:1"),
-                                    ("uuid1","click","1234","orderid","order:1"),
-                                    ("uuid2","click","1235","cookie","cookie:2"),
-                                    ("uuid2","click","1235","orderid","order:2"),
-                                    ("uuid3","click","1236","cookie","cookie:3"),
-                                    ("uuid3","click","1236","orderid","order:2"),
-                                    ("uuid3","click","1236","foo","foo:3")) )
+//    val rawData = sc.parallelize(Array(
+//                                    ("uuid1","click","1234","cookie","cookie:1"),
+//                                    ("uuid1","click","1234","orderid","order:1"),
+//                                    ("uuid2","click","1235","cookie","cookie:2"),
+//                                    ("uuid2","click","1235","orderid","order:2"),
+//                                    ("uuid3","click","1236","cookie","cookie:3"),
+//                                    ("uuid3","click","1236","orderid","order:2"),
+//                                    ("uuid3","click","1236","foo","foo:3")) )
+
+    val rawData = sc.textFile(args(0)).map(x=>x.split('\1')).map(x=>(x(0),x(1),x(2),x(3),x(4)))
+
+    //val lineLengths = lines.map(s => s.length)
 
     //TODO: Exception handling...
     //Convert to Objects
@@ -112,12 +116,10 @@ object HelloGraph6b {
       //Select CC with more than one account.
       //
 
+    //Map back to CCID,VertexType,VertexValue
     val assignedGroups = cc.vertices.join(allVertexes).map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) )
 
-
-    for( x <- assignedGroups ) {
-      println(x)
-    }
+    assignedGroups.saveAsTextFile(args(1))
   }
 
 

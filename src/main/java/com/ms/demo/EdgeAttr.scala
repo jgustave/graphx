@@ -1,7 +1,7 @@
 package com.ms.demo
 
 /**
- *
+ * TODO: Need Clarity on if I shoudl include UUID in equals...
  */
 case class EdgeAttr(dataSource : String,
                     dateTime : Long,
@@ -25,4 +25,5 @@ case class EdgeAttr(dataSource : String,
     val state = Seq(dataSource, dateTime)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
+
 }
