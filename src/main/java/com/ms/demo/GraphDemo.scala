@@ -69,8 +69,21 @@ UNION ALL
  select row_uuid, 'click' as source, utc_millis, 'orderid' as key_type, orderid as key_value from pixel_small
 
  *
+ *
+ * --num-executors 3 --driver-memory 1g --executor-memory 2g --executor-cores 1
+ *
+ * /opt/spark/bin/spark-submit --verbose --master yarn --num-executors 100 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/rawgraph hdfs:///user/jeremy/graph/demoout
  */
 object GraphDemo {
+
+  def isNull (input: String ): Boolean = {
+    if( input == null )
+      true
+    val clean = input.trim
+
+    clean.length == 0  ||  clean.equalsIgnoreCase("null") || clean.equalsIgnoreCase("\\N")
+  }
+
 
   def main( args: Array[String] ) = {
     println("Hello Graph Demo")
@@ -90,26 +103,34 @@ object GraphDemo {
 //                                    ("uuid3","click","1236","orderid","order:2"),
 //                                    ("uuid3","click","1236","foo","foo:3")) )
 
-    val rawData = sc.textFile(args(0)).map(x=>x.split('\1')).map(x=>(x(0),x(1),x(2),x(3),x(4)))
+    println("A")
+
+    val rawData = sc.textFile(args(0)).repartition(128).map(x=>x.split('\1')).map(x=>(x(0),x(1),x(2),x(3),x(4))).filter(x=> !isNull(x._1) && !isNull(x._2) && !isNull(x._3) && !isNull(x._4) && !isNull(x._5) )
 
     //val lineLengths = lines.map(s => s.length)
 
     //TODO: Exception handling...
     //Convert to Objects
+    println("B")
     val packagedData : RDD[(EdgeAttr,VertexAttr)] = packageRawData(rawData)
 
+    println("C")
     //Get Unique IDs for Vertexes
     val uniqueVertexes : RDD[(VertexId,VertexAttr)] = getUniqueVertexIds( packagedData )
 
     //Assign Unique IDS to All
+    println("D")
     val allVertexes : RDD[(VertexId,VertexAttr)] = assignVertexIds(packagedData,uniqueVertexes)
 
+    println("E")
     val connections : RDD[Edge[EdgeAttr]] = createEdges(packagedData,uniqueVertexes)
 
     //Create Graph
+    println("F")
     val graph = Graph(allVertexes,connections)
 
     //Get Connected Components
+    println("G")
     val cc = graph.connectedComponents()
 
     //(VertexId,CCId)
@@ -117,8 +138,10 @@ object GraphDemo {
       //
 
     //Map back to CCID,VertexType,VertexValue
+    println("H")
     val assignedGroups = cc.vertices.join(allVertexes).map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) )
 
+    println("I")
     assignedGroups.saveAsTextFile(args(1))
   }
 
