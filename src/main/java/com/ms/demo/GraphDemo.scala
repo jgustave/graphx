@@ -72,7 +72,8 @@ UNION ALL
  *
  * --num-executors 3 --driver-memory 1g --executor-memory 2g --executor-cores 1
  *
- * /opt/spark/bin/spark-submit --verbose --master yarn --num-executors 100 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/rawgraph hdfs:///user/jeremy/graph/demoout
+ * /opt/spark/bin/spark-submit --verbose --master yarn --num-executors 400 --executor-memory 4g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/rawgraph hdfs:///user/jeremy/graph/demoout2
+ * /opt/spark/bin/spark-submit --verbose --master yarn --num-executors 100 --executor-memory 4g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/small_raw_graph_lzo hdfs:///user/jeremy/graph/demoout3
  */
 object GraphDemo {
 
@@ -139,7 +140,7 @@ object GraphDemo {
 
     //Map back to CCID,VertexType,VertexValue
     println("H")
-    val assignedGroups = cc.vertices.join(allVertexes).map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) )
+    val assignedGroups = cc.vertices.join(allVertexes).map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) ).distinct()
 
     println("I")
     assignedGroups.saveAsTextFile(args(1))
@@ -159,7 +160,7 @@ object GraphDemo {
     packagedData.map(x=>x._2) //Vertex
                 .distinct()
                 .zipWithUniqueId()
-                .map(x=>x.reverse)
+                .map(x=>(x._2,x._1))
   }
 
   /**
@@ -172,7 +173,7 @@ object GraphDemo {
 
     //Sort of half Triplet.. An Edge, and a VertexId attched
     val edgeAndVertex: RDD[(EdgeAttr,VertexId)] = packagedData.map(x=>(x._2,x)) //Vertex and Everything
-                                                             .join(uniqueVertexes.map(x=>x.reverse)) //Join in VertexId
+                                                             .join(uniqueVertexes.map(x=>(x._2,x._1))) //Join in VertexId
                                                              .map(x=>x._2) //Drop the Join Key
                                                              .map(x=>(x._1._1,x._2)) //Just Keep EdgeAttr and VertexId
 
@@ -192,8 +193,8 @@ object GraphDemo {
   def assignVertexIds(packagedData : RDD[(EdgeAttr,VertexAttr)], uniqueVertexes : RDD[(VertexId,VertexAttr)] ) : RDD[(VertexId,VertexAttr)] = {
     packagedData.map(x=>x._2) //vertex
                 .map(x=>(x,x)) //make a K/V
-                .join(uniqueVertexes.map(x=>x.reverse)) //Join in VertexID
-                .map(x=>x._2.reverse) //Flip around
+                .join(uniqueVertexes.map(x=>(x._2,x._1))) //Join in VertexID
+                .map(x=>(x._2._2,x._2._1)) //Flip around
   }
   /**
    * Lower half (Excluding the diagonal) of the cartesian

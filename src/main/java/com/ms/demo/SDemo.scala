@@ -1,7 +1,7 @@
 package com.ms.demo
 
 import com.ms.util.Util._
-import shapeless.syntax.std.tuple._
+//import shapeless.syntax.std.tuple._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
@@ -22,10 +22,21 @@ object SDemo {
 //    }
         //yield (i, j)
 
+    val test = ("1",2,"three")
 
-    val zz = ("foo","bar","other").drop(1)
+    //return ','.join(str(d) for d in test)
 
-    val ddd = List("A","B","C")
+    for(x <- test.productIterator ) {
+      println(x)
+    }
+
+//    val t2 = test.reverse
+
+//    val foo = ("foo","bar","other").reverse
+//
+//    val bar = ("foo","bar","other").drop(1)
+//
+//    val ddd = List("A","B","C")
 
     //println(cross(ddd,ddd))
 
