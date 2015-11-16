@@ -1,7 +1,7 @@
 package com.ms.demo
 
 import com.ms.util.Util._
-//import shapeless.syntax.std.tuple._
+import shapeless.syntax.std.tuple._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
@@ -32,7 +32,7 @@ object SDemo {
 
 //    val t2 = test.reverse
 
-//    val foo = ("foo","bar","other").reverse
+    //val foo = ("foo","bar","other").reverse
 //
 //    val bar = ("foo","bar","other").drop(1)
 //

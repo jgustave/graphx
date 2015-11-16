@@ -10,6 +10,32 @@
     <name>Simple Project</name>
     <packaging>jar</packaging>
 
+    <repositories>
+      <repository>
+        <id>oss.sonatype.org</id>
+         <name>sonatype sapshots</name>
+         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+       </repository>
+     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>Codehaus Snapshots</id>
+            <url>http://snapshots.repository.codehaus.org/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+        <pluginRepository>
+          <id>oss.sonatype.org</id>
+           <name>sonatype sapshots</name>
+           <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+         </pluginRepository>
+
+    </pluginRepositories>
 
 
     <dependencies>
@@ -34,6 +60,16 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+        	<groupId>org.scala-lang</groupId>
+        	<artifactId>scala-reflect</artifactId>
+        	<version>2.10.6</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.scalamacros</groupId>
+        	<artifactId>paradise_2.11.0-M8</artifactId>
+        	<version>2.0.0-M8</version>
+        </dependency>
         <!--<dependency>-->
         	<!--<groupId>com.typesafe.scala-logging</groupId>-->
         	<!--<artifactId>scala-logging_2.10</artifactId>-->
@@ -60,21 +96,22 @@
         <plugins>
 
             <plugin>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <executions>
-                      <execution>
-                        <phase>package</phase>
-                        <goals>
-                          <goal>single</goal>
-                        </goals>
-                      </execution>
-                    </executions>
-                    <configuration>
-                      <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                      </descriptorRefs>
-                    </configuration>
-                  </plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <phase>package</phase>
+                    <goals>
+                      <goal>single</goal>
+                    </goals>
+                  </execution>
+                </executions>
+                <configuration>
+                  <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                  </descriptorRefs>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
@@ -95,6 +132,17 @@
                         </goals>
                     </execution>
                 </executions>
+
+                <!--<configuration>-->
+                    <!--<compilerPlugins>-->
+                      <!--<compilerPlugin>-->
+                        <!--<groupId>org.scalamacros</groupId>-->
+                        <!--<artifactId>paradise_2.10</artifactId>-->
+                        <!--<version>2.0.0</version>-->
+                      <!--</compilerPlugin>-->
+                    <!--</compilerPlugins>-->
+                <!--</configuration>-->
+
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
