@@ -4,6 +4,7 @@ import org.apache.spark._
 import org.apache.spark.graphx.{Edge, Graph, VertexId}
 import org.apache.spark.rdd.RDD
 import com.ms.demo.GraphDemo._
+import shapeless.syntax.std.tuple._
 
 /**
  * http://spark.apache.org/docs/latest/quick-start.html
@@ -112,7 +113,10 @@ object HelloGraph6b {
       //Select CC with more than one account.
       //
 
-    val assignedGroups = cc.vertices.join(allVertexes).map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) ).distinct()
+    val assignedGroups = cc.vertices.join(allVertexes)
+                                    .map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) )
+                                    .distinct()
+                                    .map(x=>x._1 + "," + x._2+ "," + x._3)
 
 
     for( x <- assignedGroups ) {
