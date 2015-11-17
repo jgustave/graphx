@@ -140,7 +140,10 @@ object GraphDemo {
 
     //Map back to CCID,VertexType,VertexValue
     println("H")
-    val assignedGroups = cc.vertices.join(allVertexes).map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) ).distinct()
+    val assignedGroups = cc.vertices.join(allVertexes)
+                                    .map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) )
+                                    .distinct()
+                                    .map(x=>flatProduct(x).mkString(","))
 
     println("I")
     assignedGroups.saveAsTextFile(args(1))
@@ -204,6 +207,11 @@ object GraphDemo {
    * @return
    */
   def halfcross[L <: Long](xs: Traversable[L], ys: Traversable[L]) = for { x <- xs; y <- ys if x < y  } yield (x, y)
+
+  def flatProduct(t: Product): Iterator[Any] = t.productIterator.flatMap {
+    case p: Product => flatProduct(p)
+    case x => Iterator(x)
+  }
 }
 
 
