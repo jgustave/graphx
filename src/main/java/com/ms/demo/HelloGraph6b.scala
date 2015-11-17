@@ -116,7 +116,7 @@ object HelloGraph6b {
     val assignedGroups = cc.vertices.join(allVertexes)
                                     .map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) )
                                     .distinct()
-                                    .map(x=>x._1 + "," + x._2+ "," + x._3)
+                                    .map(x=>flatProduct(x).mkString(","))
 
 
     for( x <- assignedGroups ) {

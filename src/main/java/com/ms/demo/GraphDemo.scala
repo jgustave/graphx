@@ -72,8 +72,9 @@ UNION ALL
  *
  * --num-executors 3 --driver-memory 1g --executor-memory 2g --executor-cores 1
  *
+ * spark.task.maxfailures
  * /opt/spark/bin/spark-submit --verbose --master yarn --num-executors 400 --executor-memory 4g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/rawgraph hdfs:///user/jeremy/graph/demoout2
- * /opt/spark/bin/spark-submit --verbose --master yarn --num-executors 100 --executor-memory 4g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/small_raw_graph_lzo hdfs:///user/jeremy/graph/demoout3
+ * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxfailures=30 --master yarn --num-executors 400 --executor-memory 4g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout9
  */
 object GraphDemo {
 
@@ -140,7 +141,10 @@ object GraphDemo {
 
     //Map back to CCID,VertexType,VertexValue
     println("H")
-    val assignedGroups = cc.vertices.join(allVertexes).map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) ).distinct()
+    val assignedGroups = cc.vertices.join(allVertexes)
+                                    .map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) )
+                                    .distinct()
+                                    .map(x=>flatProduct(x).mkString(","))
 
     println("I")
     assignedGroups.saveAsTextFile(args(1))
@@ -204,6 +208,11 @@ object GraphDemo {
    * @return
    */
   def halfcross[L <: Long](xs: Traversable[L], ys: Traversable[L]) = for { x <- xs; y <- ys if x < y  } yield (x, y)
+
+  def flatProduct(t: Product): Iterator[Any] = t.productIterator.flatMap {
+    case p: Product => flatProduct(p)
+    case x => Iterator(x)
+  }
 }
 
 
