@@ -3,6 +3,7 @@ package com.ms.demo
 import org.apache.spark._
 import org.apache.spark.graphx.{Edge, Graph, VertexId}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.storage.StorageLevel
 import shapeless.syntax.std.tuple._
 
 /**
@@ -73,8 +74,8 @@ UNION ALL
  * --num-executors 3 --driver-memory 1g --executor-memory 2g --executor-cores 1
  *
  * spark.task.maxfailures
- * /opt/spark/bin/spark-submit --verbose --master yarn --num-executors 400 --executor-memory 4g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/rawgraph hdfs:///user/jeremy/graph/demoout2
- * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxfailures=30 --master yarn --num-executors 400 --executor-memory 4g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout9
+ * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=40 --master yarn --num-executors 400 --executor-memory 4g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/rawgraph hdfs:///user/jeremy/graph/demoout2
+ * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=40 --master yarn --num-executors 200 --executor-memory 8g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout1 200
  */
 object GraphDemo {
 
@@ -92,22 +93,24 @@ object GraphDemo {
 
     //conf.set("textinputformat.record.delimiter", "\u0001")
     val conf = new SparkConf().setAppName("Graph Demo")
+
+    //Enable Kryo Serialization and Register some classes.
+    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    conf.registerKryoClasses(Array(classOf[EdgeAttr], classOf[VertexAttr]))
+
     val sc   = new SparkContext(conf)
+    val inputPath     = args(0)
+    val outputPath    = args(1)
+    val numPartitions = Integer.parseInt(args(2))
 
-
-    //UUID,source,time,type,val
-//    val rawData = sc.parallelize(Array(
-//                                    ("uuid1","click","1234","cookie","cookie:1"),
-//                                    ("uuid1","click","1234","orderid","order:1"),
-//                                    ("uuid2","click","1235","cookie","cookie:2"),
-//                                    ("uuid2","click","1235","orderid","order:2"),
-//                                    ("uuid3","click","1236","cookie","cookie:3"),
-//                                    ("uuid3","click","1236","orderid","order:2"),
-//                                    ("uuid3","click","1236","foo","foo:3")) )
+    sc.setCheckpointDir(outputPath+"/tmp/")
 
     println("A")
 
-    val rawData = sc.textFile(args(0)).repartition(128).map(x=>x.split('\1')).map(x=>(x(0),x(1),x(2),x(3),x(4))).filter(x=> !isNull(x._1) && !isNull(x._2) && !isNull(x._3) && !isNull(x._4) && !isNull(x._5) )
+    val rawData = sc.textFile(inputPath).repartition(numPartitions)
+                                        .map(x=>x.split('\1'))
+                                        .map(x=>(x(0),x(1),x(2),x(3),x(4)))
+                                        .filter(x=> !isNull(x._1) && !isNull(x._2) && !isNull(x._3) && !isNull(x._4) && !isNull(x._5) )
 
     //val lineLengths = lines.map(s => s.length)
 
@@ -120,16 +123,22 @@ object GraphDemo {
     //Get Unique IDs for Vertexes
     val uniqueVertexes : RDD[(VertexId,VertexAttr)] = getUniqueVertexIds( packagedData )
 
+    uniqueVertexes.persist(StorageLevel.MEMORY_AND_DISK)
+    packagedData.persist(StorageLevel.MEMORY_AND_DISK_SER)
+
     //Assign Unique IDS to All
     println("D")
     val allVertexes : RDD[(VertexId,VertexAttr)] = assignVertexIds(packagedData,uniqueVertexes)
+    allVertexes.persist(StorageLevel.MEMORY_AND_DISK)
 
     println("E")
     val connections : RDD[Edge[EdgeAttr]] = createEdges(packagedData,uniqueVertexes)
+    connections.persist(StorageLevel.MEMORY_AND_DISK)
 
     //Create Graph
     println("F")
     val graph = Graph(allVertexes,connections)
+    //graph.persist(StorageLevel.MEMORY_AND_DISK)
 
     //Get Connected Components
     println("G")
@@ -147,7 +156,7 @@ object GraphDemo {
                                     .map(x=>flatProduct(x).mkString(","))
 
     println("I")
-    assignedGroups.saveAsTextFile(args(1))
+    assignedGroups.saveAsTextFile(outputPath +"/out/")
   }
 
 

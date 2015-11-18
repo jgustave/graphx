@@ -32,7 +32,7 @@ object SDemo {
 
 //    val t2 = test.reverse
 
-    val foo = ("foo","bar","other").reverse
+    //val foo = ("foo","bar","other").reverse
 //
 //    val bar = ("foo","bar","other").drop(1)
 //
@@ -41,7 +41,7 @@ object SDemo {
     //println(cross(ddd,ddd))
 
 //    val foo = diagonal(Array("A","B"))
-      println( foo )
+     // println( foo )
 
 
 //
