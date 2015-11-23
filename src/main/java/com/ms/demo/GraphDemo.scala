@@ -85,7 +85,7 @@ UNION ALL
  * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=40 --master yarn --num-executors 200 --executor-memory 8g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout1 200
  *
  * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=100 --conf spark.rdd.compress=true --master yarn --num-executors 100 --executor-memory 12g --driver-memory 2g --executor-cores 1 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/lcp2.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout111 200
- * 
+ *
  * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=100 --conf spark.rdd.compress=true --master yarn --num-executors 200 --executor-memory 12g --driver-memory 2g --executor-cores 1 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/lcp4.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout333 200
  */
 object GraphDemo {
@@ -118,17 +118,14 @@ object GraphDemo {
 
     println("A")
 
-    val rawData = sc.textFile(inputPath).repartition(numPartitions)
-                                        .map(x=>x.split('\1'))
-                                        .map(x=>(x(0),x(1),x(2),x(3),x(4)))
-                                        .filter(x=> !isNull(x._1) && !isNull(x._2) && !isNull(x._3) && !isNull(x._4) && !isNull(x._5) )
+    val rawParsedData = parseRawData(sc.textFile(inputPath).repartition(numPartitions))
 
     //val lineLengths = lines.map(s => s.length)
 
     //TODO: Exception handling...
     //Convert to Objects
     println("B")
-    val packagedData : RDD[(EdgeAttr,VertexAttr)] = packageRawData(rawData)
+    val packagedData : RDD[(EdgeAttr,VertexAttr)] = packageRawData(rawParsedData)
 
     println("C")
     //Get Unique IDs for Vertexes
@@ -170,6 +167,19 @@ object GraphDemo {
     assignedGroups.saveAsTextFile(outputPath +"/out/")
   }
 
+
+  /**
+    * Get delimited columns.
+    * @param rawInput
+    * @return
+    */
+  def parseRawData( rawInput :RDD[String] ) : RDD[(String,String,String,String,String)] = {
+
+    rawInput.map(x=>x.split('\1'))
+            //.filter(_.length!=5)
+            .map(x=>(x(0),x(1),x(2),x(3),x(4)))
+            .filter(x=> !isNull(x._1) && !isNull(x._2) && !isNull(x._3) && !isNull(x._4) && !isNull(x._5) )
+  }
 
   /**
    * Convert Strings to Objects

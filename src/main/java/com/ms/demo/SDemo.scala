@@ -5,6 +5,7 @@ import shapeless.syntax.std.tuple._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
+import scala.util.Try
 
 /**
  * http://spark.apache.org/docs/latest/quick-start.html
@@ -22,11 +23,15 @@ object SDemo {
 //    }
         //yield (i, j)
 
-    val test = ("1",2,"three")
+    val test = List(1,2,0,3)
+
+    //val bar = test.map(x=>try{x/x}catch{case e : Exception => 888 })
+    val bar = test.map(x=>Try{x/x} ).filter(_.isSuccess).map(_.get)
+
 
     //return ','.join(str(d) for d in test)
 
-    for(x <- test.productIterator ) {
+    for(x <- bar ) {
       println(x)
     }
 
