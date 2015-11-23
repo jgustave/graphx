@@ -71,11 +71,22 @@ UNION ALL
 
  *
  *
+ *  spark.rdd.compress true
+       spark.storage.memoryFraction 1
+       spark.core.connection.ack.wait.timeout 600
+       spark.akka.frameSize 50
+ *
+ * spark.network.timeout
+ *
  * --num-executors 3 --driver-memory 1g --executor-memory 2g --executor-cores 1
  *
  * spark.task.maxfailures
  * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=40 --master yarn --num-executors 400 --executor-memory 4g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/rawgraph hdfs:///user/jeremy/graph/demoout2
  * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=40 --master yarn --num-executors 200 --executor-memory 8g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout1 200
+ *
+ * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=100 --conf spark.rdd.compress=true --master yarn --num-executors 100 --executor-memory 12g --driver-memory 2g --executor-cores 1 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/lcp2.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout111 200
+ * 
+ * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=100 --conf spark.rdd.compress=true --master yarn --num-executors 200 --executor-memory 12g --driver-memory 2g --executor-cores 1 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/lcp4.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout333 200
  */
 object GraphDemo {
 
@@ -123,17 +134,17 @@ object GraphDemo {
     //Get Unique IDs for Vertexes
     val uniqueVertexes : RDD[(VertexId,VertexAttr)] = getUniqueVertexIds( packagedData )
 
-    uniqueVertexes.persist(StorageLevel.MEMORY_AND_DISK)
+    uniqueVertexes.persist(StorageLevel.MEMORY_AND_DISK_SER)
     packagedData.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
     //Assign Unique IDS to All
     println("D")
     val allVertexes : RDD[(VertexId,VertexAttr)] = assignVertexIds(packagedData,uniqueVertexes)
-    allVertexes.persist(StorageLevel.MEMORY_AND_DISK)
+    allVertexes.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
     println("E")
     val connections : RDD[Edge[EdgeAttr]] = createEdges(packagedData,uniqueVertexes)
-    connections.persist(StorageLevel.MEMORY_AND_DISK)
+    connections.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
     //Create Graph
     println("F")
