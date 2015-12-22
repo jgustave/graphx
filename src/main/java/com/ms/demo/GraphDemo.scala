@@ -119,17 +119,14 @@ object GraphDemo {
 
     println("A")
 
-    val rawData = sc.textFile(inputPath).repartition(numPartitions)
-                                        .map(x=>x.split('\1'))
-                                        .map(x=>(x(0),x(1),x(2),x(3),x(4)))
-                                        .filter(x=> !isNull(x._1) && !isNull(x._2) && !isNull(x._3) && !isNull(x._4) && !isNull(x._5) )
+    val rawParsedData = parseRawData(sc.textFile(inputPath).repartition(numPartitions))
 
     //val lineLengths = lines.map(s => s.length)
 
     //TODO: Exception handling...
     //Convert to Objects
     println("B")
-    val packagedData : RDD[(EdgeAttr,VertexAttr)] = packageRawData(rawData)
+    val packagedData : RDD[(EdgeAttr,VertexAttr)] = packageRawData(rawParsedData)
 
     println("C")
     //Get Unique IDs for Vertexes
@@ -171,6 +168,19 @@ object GraphDemo {
     assignedGroups.saveAsTextFile(outputPath +"/out/")
   }
 
+
+  /**
+    * Get delimited columns.
+    * @param rawInput
+    * @return
+    */
+  def parseRawData( rawInput :RDD[String] ) : RDD[(String,String,String,String,String)] = {
+
+    rawInput.map(x=>x.split('\1'))
+            //.filter(_.length!=5)
+            .map(x=>(x(0),x(1),x(2),x(3),x(4)))
+            .filter(x=> !isNull(x._1) && !isNull(x._2) && !isNull(x._3) && !isNull(x._4) && !isNull(x._5) )
+  }
 
   /**
    * Convert Strings to Objects
