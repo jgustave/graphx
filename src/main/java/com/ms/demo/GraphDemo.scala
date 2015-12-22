@@ -187,6 +187,18 @@ object GraphDemo {
 
   /**
    * Convert Strings to Objects
+   * The input format is row_uuid,source,utcMillis,keyType,keyValue
+   * Which represents a row I saw in a file, that may show 2 or more vertexes (keyType,keyValue), which are implicitly connected by an edge
+   *
+   * 800ed948-2203-411d-847c-d02339091b02,click,1437857236,mm_account,\N
+   * 800ed948-2203-411d-847c-d02339091b02,click,1437857236,mm_cookie,2riJxPFgjuFnTpG3RVIHjF7pSCw-Qxm82YE
+   * 800ed948-2203-411d-847c-d02339091b02,click,1437857236,mm_uuid,b3f45579-7f9d-4b00-98af-afe9c570903a
+   * 800ed948-2203-411d-847c-d02339091b02,click,1437857236,mm_emailid,\N
+   * 800ed948-2203-411d-847c-d02339091b02,click,1437857236,orderid,\N
+   *
+   * The above shows that two nodes: {mm_uuid,b3f45579-7f9d-4b00-98af-afe9c570903a} and {mm_cookie,2riJxPFgjuFnTpG3RVIHjF7pSCw-Qxm82YE}
+   * that are implicitly linked together.
+   * 
    * @param rawInput
    * @return
    */
