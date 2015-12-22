@@ -85,8 +85,9 @@ UNION ALL
  * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=40 --master yarn --num-executors 200 --executor-memory 8g --driver-memory 1g --executor-cores 2 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/graph2-1.0-SNAPSHOT-jar-with-dependencies.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout1 200
  *
  * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=100 --conf spark.rdd.compress=true --master yarn --num-executors 100 --executor-memory 12g --driver-memory 2g --executor-cores 1 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/lcp2.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout111 200
- * 
+ *
  * /opt/spark/bin/spark-submit --verbose --conf spark.task.maxFailures=100 --conf spark.rdd.compress=true --master yarn --num-executors 200 --executor-memory 12g --driver-memory 2g --executor-cores 1 --deploy-mode cluster --driver-class-path $(find /opt/hadoop/share/hadoop/mapreduce/lib/hadoop-lzo-* | head -n 1) --queue hive-delivery-high --class com.ms.demo.GraphDemo ~/tmp/lcp4.jar hdfs:///user/jeremy/graph/raw_pixel/raw_graph_lzo hdfs:///user/jeremy/graph/demoout333 200
+ * 6g works.. 4g doesn't
  */
 object GraphDemo {
 
