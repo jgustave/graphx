@@ -132,6 +132,9 @@ object GraphDemo {
     //Get Unique IDs for Vertexes
     val uniqueVertexes : RDD[(VertexId,VertexAttr)] = getUniqueVertexIds( packagedData )
 
+    //It's important to persist here for two reasons.
+    // 1 .. the longer the chain of unpersisted computations, the more likely Spark seems to start thrashing / recomputing
+    // 2 .. Since we are zipping with a random unique ID.. If it get recalculated, then we will have inconsistent/non deterministic results
     uniqueVertexes.persist(StorageLevel.MEMORY_AND_DISK_SER)
     packagedData.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
