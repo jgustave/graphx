@@ -119,7 +119,7 @@ object GraphDemo {
 
     println("A")
 
-    val rawParsedData = parseRawData(sc.textFile(inputPath).repartition(numPartitions))
+    val rawParsedData = parseRawData('\1',sc.textFile(inputPath).repartition(numPartitions))
 
     //val lineLengths = lines.map(s => s.length)
 
@@ -177,10 +177,9 @@ object GraphDemo {
     * @param rawInput
     * @return
     */
-  def parseRawData( rawInput :RDD[String] ) : RDD[(String,String,String,String,String)] = {
+  def parseRawData( delim : Char, rawInput :RDD[String] ) : RDD[(String,String,String,String,String)] = {
 
-    rawInput.map(x=>x.split('\1'))
-            //.filter(_.length!=5)
+    rawInput.map(x=>x.split(delim))
             .map(x=>(x(0),x(1),x(2),x(3),x(4)))
             .filter(x=> !isNull(x._1) && !isNull(x._2) && !isNull(x._3) && !isNull(x._4) && !isNull(x._5) )
   }
@@ -198,7 +197,7 @@ object GraphDemo {
    *
    * The above shows that two nodes: {mm_uuid,b3f45579-7f9d-4b00-98af-afe9c570903a} and {mm_cookie,2riJxPFgjuFnTpG3RVIHjF7pSCw-Qxm82YE}
    * that are implicitly linked together.
-   * 
+   *
    * @param rawInput
    * @return
    */
