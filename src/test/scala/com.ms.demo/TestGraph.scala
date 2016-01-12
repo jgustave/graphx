@@ -40,11 +40,13 @@ class TestGraph {
 
 
     val lines = Array("row1,click,1234,account,1",
-                      "row1,click,1234,account,1" )
+                      "row2,click,1235,account,2" )
     val inputData :RDD[String] = sc.parallelize(lines)
     val parsed : RDD[(String,String,String,String,String)] = GraphDemo.parseRawData(',',inputData)
 
     Assert.assertEquals(2,parsed.count())
+    Assert.assertTrue(parsed.collect().contains(("row1","click","1234","account","1") ))
+    Assert.assertTrue(parsed.collect().contains(("row2","click","1235","account","2") ))
   }
 
   /**
