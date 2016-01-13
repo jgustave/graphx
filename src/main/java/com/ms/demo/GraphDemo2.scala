@@ -67,8 +67,8 @@ object GraphDemo2 {
 
 
     //TODO: Exception handling...
-    //Convert to Objects
-    println("B")
+
+    // This is a collection of edges and vertexes.. Edges contain row_uuids.. Therefore.. many duplicate VertexAttrs
     val packagedData : RDD[(EdgeAttr,VertexAttr)] = packageRawData(rawParsedData)
 
     println("C")
@@ -81,18 +81,18 @@ object GraphDemo2 {
     uniqueVertexes.persist(StorageLevel.MEMORY_AND_DISK_SER)
     packagedData.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
-    //Assign Unique IDS to All
-    println("D")
-    val allVertexes : RDD[(VertexId,VertexAttr)] = assignVertexIds(packagedData,uniqueVertexes)
-    allVertexes.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
-    println("E")
+    //TODO: This doesn't seem necessary. Why can't we just use the uniqueVertexes?.. It probably does a distinct anyways.
+//    val allVertexes : RDD[(VertexId,VertexAttr)] = assignVertexIds(packagedData,uniqueVertexes)
+//    allVertexes.persist(StorageLevel.MEMORY_AND_DISK_SER)
+
+    //The EDGE is a tripplet SRC,DST,EdgeAttr
     val connections : RDD[Edge[EdgeAttr]] = createEdges(packagedData,uniqueVertexes)
     connections.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
     //Create Graph
     println("F")
-    val graph = Graph(allVertexes,connections)
+    val graph = Graph(uniqueVertexes,connections)
     //graph.persist(StorageLevel.MEMORY_AND_DISK)
 
     //Get Connected Components
