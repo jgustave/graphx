@@ -162,6 +162,7 @@ object GraphDemo {
 
     //Map back to CCID,VertexType,VertexValue
     println("H")
+    //cc.verticies is  RDD[(VertexId,ConnectedComponentId)]
     val assignedGroups = cc.vertices.join(allVertexes)
                                     .map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) )
                                     .distinct()

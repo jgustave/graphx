@@ -106,7 +106,7 @@ object GraphDemo2 {
     //Map back to CCID,VertexType,VertexValue
     println("H")
 
-//    val assignedGroups : RDD[(VertexId,VertexAttr)] = cc.vertices.join(allVertexes)
+//    val assignedGroups : RDD[(VertexId,VertexAttr)] = cc.vertices.join(uniqueVertexes)
 
 //                                    .map(x=>(x._2._1,x._2._2.vertexType,x._2._2.vertexValue) )
 //                                    .distinct();
