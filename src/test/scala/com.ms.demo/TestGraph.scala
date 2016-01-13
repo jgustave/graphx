@@ -86,12 +86,12 @@ class TestGraph {
                       Edge(1L,4L,EdgeAttr("src",1,"row3")), //bridge in
                       Edge(5L,6L,EdgeAttr("src",1,"row4")) //island
     )
-    val vertexes = Array((1L,VertexAttr("account","1")),
-                         (2L,VertexAttr("account","2")),
-                         (3L,VertexAttr("account","3")),
-                         (4L,VertexAttr("account","4")),
-                         (5L,VertexAttr("account","5")),
-                         (6L,VertexAttr("account","6"))
+    val vertexes = Array((1L,VertexAttr("a","1")),
+                         (2L,VertexAttr("a","2")),
+                         (3L,VertexAttr("b","3")),
+                         (4L,VertexAttr("c","4")),
+                         (5L,VertexAttr("b","5")),
+                         (6L,VertexAttr("c","6"))
     )
 
     val connections : RDD[Edge[EdgeAttr]] = sc.parallelize(edges)
@@ -101,7 +101,12 @@ class TestGraph {
     val cc =  graph.connectedComponents()
 
     //(VertexId,ComponentId)
-    val bar =  cc.vertices.collect()
+
+    //(ComponentId,VertexAttr)
+    val assignedGroups : RDD[(Long,VertexAttr)]= cc.vertices.join(uniqueVertexes).map(x=>x._2 )
+
+    //val bar = assignedGroups.collect()
+    //assignedGroups.gr
 
     //Get to CCID,VertexAttr
     //Resolve to CCID,BestVertexAttr
@@ -118,6 +123,33 @@ class TestGraph {
     println("")
   }
 
+
+  @Test
+  def testFold(): Unit = {
+
+    val data = Array((1,("a",2)),
+                     (1,("b",1)),
+                     (1,("a",3)),
+                     (2,("a",4))
+    )
+
+    val dataRdd  = sc.parallelize(data)
+
+    implicit val fooOrdering = new Ordering[(String,Int)] {
+         override def compare(a: (String,Int), b: (String,Int)) = a._1.compare(b._1)
+    }
+
+    //dataRdd.foldByKey( ("",1) )(folder)
+    var folded = dataRdd.foldByKey( ("",1) ){(a,b)=>if(a._1.compare(b._1) >0) a else b }
+
+    val bar = folded.collect()
+
+    println("")
+  }
+
+  def folder(a : (String,Int), b : (String,Int) ) : (String,Int) = {
+    b
+  }
 
   /**
     * TODO: Figure out DependencyInjection
