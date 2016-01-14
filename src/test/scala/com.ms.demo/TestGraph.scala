@@ -11,8 +11,9 @@ import GraphDemo._
 /**
   *
   */
-class TestGraph {
+class TestGraph extends Serializable {
 
+  @transient
   var sc : SparkContext = null
 
   @Before
@@ -136,11 +137,30 @@ class TestGraph {
     val dataRdd  = sc.parallelize(data)
 
     implicit val fooOrdering = new Ordering[(String,Int)] {
-         override def compare(a: (String,Int), b: (String,Int)) = a._1.compare(b._1)
+         override def compare(a: (String,Int), b: (String,Int)) = -1 * a._2.compare(b._2)
     }
 
-    //dataRdd.foldByKey( ("",1) )(folder)
-    var folded = dataRdd.foldByKey( ("",1) ){(a,b)=>if(a._1.compare(b._1) >0) a else b }
+
+
+//    var sorted = dataRdd.sortByKey()
+//    var bar = sorted.collect()
+
+
+//    //dataRdd.foldByKey( ("",1) )(folder)
+    //var folded = dataRdd.foldByKey( null ){(a,b)=> if (a==null) b else if (b==null) a else if( a._1.compare(b._1) >0) a else b }
+
+    var folded = dataRdd.foldByKey( null ){(a,b)=> {
+      if (a == null) b
+      else if (b == null) a
+
+      val comp = foo(a._1).compare(foo(b._1))
+      if (comp > 0) a
+      else if (comp < 0) b
+      else b
+
+    }
+    }
+
 
     val bar = folded.collect()
 
@@ -149,6 +169,15 @@ class TestGraph {
 
   def folder(a : (String,Int), b : (String,Int) ) : (String,Int) = {
     b
+  }
+
+  def foo( input : String ) : Int = {
+    input match {
+      case "b" => 3
+      case "subject" => 2
+      case "mm_uuid" => 1
+      case _ => 0
+    }
   }
 
   /**
